@@ -9,8 +9,10 @@ CLIENT_ID = ""
 
 
 class FileChangeHandler(FileSystemEventHandler):
-    def __init__(self, rpc):
+    def __init__(self, rpc, start):
         self.rpc = rpc
+        self.start = start
+
 
     def on_modified(self, event):
         if event.src_path == os.path.abspath(FILE_PATH):
@@ -20,9 +22,9 @@ class FileChangeHandler(FileSystemEventHandler):
             except Exception as e:
                 print(f"Error processing file: {e}")
 
+
     @staticmethod
     def parse_file(file_path):
-        """Parse the file and return a dictionary of presence data."""
         presence_data = {}
         with open(file_path, "r") as file:
             for line in file:
@@ -32,14 +34,26 @@ class FileChangeHandler(FileSystemEventHandler):
 
 
     def update_discord_presence(self, rpc, presence_data):
-        """Update Discord Rich Presence."""
-        # TODO FIX SMALL_IMAGE
+        details = f"{presence_data['name']} - Level {presence_data['level']}"
+        state = ""
+        if presence_data['zone'] == "" and presence_data['subzone'] == "":
+            state = "In character selection"
+        else:
+            state = f"{presence_data['zone']} - {presence_data['subzone']}" if presence_data['subzone'] != "" else presence_data['zone']
+        large_image = "twow"
+        large_text = "Turtle WoW — Mysteries of Azeroth"
+        small_image = f"{presence_data['class'].lower()}"
+        small_text = f"{presence_data['race']} {presence_data['class']}"
+
         try:
             rpc.update(
-                details=f"{presence_data['name']} - Level {presence_data['level']}",
-                state=f"{presence_data['zone']} {f"- {presence_data['subzone']}" if presence_data['subzone'] != "" else ""}",
-                small_image=f".\\class_images\\{presence_data['class']}.png",
-                small_text=f"{presence_data['race']} {f"- {presence_data['class']}" if presence_data['class'] != "" else ""}"
+                start=self.start,
+                details=details,
+                state=state,
+                large_image=large_image,
+                large_text=large_text,
+                small_image=small_image,
+                small_text=small_text
             )
         except Exception as e:
             print(f"Failed to update Discord presence: {e}")
@@ -50,12 +64,12 @@ def main():
     rpc.connect()
     print("Connected to Discord RPC")
 
-    event_handler = FileChangeHandler(rpc)
+    event_handler = FileChangeHandler(rpc, time.time())
     observer = Observer()
     observer.schedule(event_handler, path=os.path.dirname(FILE_PATH), recursive=False)
 
     try:
-        print(f"Watching for changes in {FILE_PATH}...")
+        print("Observing game activity...")
         observer.start()
         while True:
             time.sleep(1)  # keep main thread alive
