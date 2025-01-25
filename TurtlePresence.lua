@@ -3,6 +3,7 @@ TurtlePresence:RegisterEvent("PLAYER_ENTERING_WORLD")
 TurtlePresence:RegisterEvent("ZONE_CHANGED")
 TurtlePresence:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 TurtlePresence:RegisterEvent("PLAYER_LEVEL_UP")
+TurtlePresence:RegisterEvent("PLAYER_XP_UPDATE")
 
 local function printDebugInfo(name, realm, class, zone, level, race, subzone)
     local debugMessage = string.format(
@@ -18,7 +19,7 @@ local function updatePresenceData(name, realm, class, zone, level, race, subzone
         name, realm, class, zone, level, race, subzone
     )
 
-    -- SuperWoW feature - export to game directory/Imports/filename.txt
+    -- SuperWoW feature - export to game directory/Imports/TurtlePresenceData.txt
     ExportFile("TurtlePresenceData", fileContent)
 end
 
@@ -32,10 +33,10 @@ local function onEvent(self, event, arg1, ...)
     local level = UnitLevel("player")
 
     if event == "PLAYER_LEVEL_UP" then
-        level = level + 1
+        level = arg1
     end
 
-    printDebugInfo(name, realm, class, zone, level, race, subzone)
+    -- printDebugInfo(name, realm, class, zone, level, race, subzone)
     updatePresenceData(name, realm, class, zone, level, race, subzone)
 end
 

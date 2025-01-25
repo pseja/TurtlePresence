@@ -4,7 +4,7 @@ from pypresence import Presence
 import time
 import os
 
-FILE_PATH = "E:\\TWoW\\Imports\\TurtlePresenceData.txt"
+FILE_PATH = "E:\\TWoW\\Imports\\TurtlePresenceData.txt" # path to Turtle WoW directory 
 CLIENT_ID = ""
 
 
@@ -31,7 +31,6 @@ class FileChangeHandler(FileSystemEventHandler):
                 key, value = line.strip().split("=", 1)
                 presence_data[key] = value
         return presence_data
-
 
     def update_discord_presence(self, rpc, presence_data):
         details = f"{presence_data['name']} - Level {presence_data['level']}"
