@@ -8,10 +8,26 @@ TurtlePresence:RegisterEvent("PLAYER_XP_UPDATE")
 local lastPresenceData = ""
 
 local function ternary(condition, T, F)
-    if cond then
+    if condition then
         return T
     else
         return F
+    end
+end
+
+local function isPlayerHardcore()
+    local i = 1
+    while true do
+        local spellName, _ = GetSpellName(i, BOOKTYPE_SPELL)
+        if spellName == "Hardcore" then
+            return "True"
+        end
+
+        if not spellName then
+            return "False"
+        end
+
+        i = i + 1
     end
 end
 
@@ -24,14 +40,15 @@ local function getPlayerData(event, arg1)
         subzone = GetSubZoneText(), 
         race = UnitRace("player"), 
         level = ternary(event == "PLAYER_LEVEL_UP", arg1, UnitLevel("player")),
+        hardcore = isPlayerHardcore()
     }
 end
 
 local function serializePlayerData(playerData)
     return string.format(
-        "name=%s\nrealm=%s\nclass=%s\nzone=%s\nlevel=%d\nrace=%s\nsubzone=%s",
+        "name=%s\nrealm=%s\nclass=%s\nzone=%s\nlevel=%d\nrace=%s\nsubzone=%s\nhardcore=%s",
         playerData.name, playerData.realm, playerData.class, playerData.zone,
-        playerData.level, playerData.race, playerData.subzone
+        playerData.level, playerData.race, playerData.subzone, playerData.hardcore
     )
 end
 
