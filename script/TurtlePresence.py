@@ -62,8 +62,15 @@ class FileChangeHandler(FileSystemEventHandler):
 
 def main():
     rpc = Presence(CLIENT_ID)
-    print("Connecting to Discord RPC...")
-    rpc.connect()
+    print("Connecting to Discord RPC...", end=" ")
+    try:
+        rpc.connect()
+        print("✅")
+    except Exception as e:
+        print("❌")
+        print(f"\n  > Failed to connect to Discord RPC: {e}")
+        input("\nPress Enter to exit...")
+        return 1
 
     event_handler = FileChangeHandler(rpc, time.time())
     observer = Observer()
@@ -75,16 +82,28 @@ def main():
         while True:
             time.sleep(1)  # keep main thread alive
     except KeyboardInterrupt:
-        print("Stopping observer...")
+        print("Stopping observer...", end=" ")
         observer.stop()
+        print("✅")
 
-        print("Clearing Discord RPC activity...")
-        rpc.clear()
+        print("Clearing Discord RPC activity...", end=" ")
+        try:
+            rpc.clear()
+            print("✅")
+        except Exception as e:
+            print("❌")
+            print(f"\n  > Failed to clear Discord RPC: {e}")
 
-        print("Disconnecting from Discord RPC...")
-        rpc.close()
+        print("Disconnecting from Discord RPC...", end=" ")
+        try:
+            rpc.close()
+            print("✅")
+        except Exception as e:
+            print("❌")
+            print(f"\n  > Failed to disconnect from Discord RPC: {e}")
 
     observer.join()
+    input("Press Enter to exit...")
 
 
 if __name__ == "__main__":
