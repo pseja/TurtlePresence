@@ -4,8 +4,9 @@ from pypresence import Presence
 import time
 import os
 
-FILE_PATH = "E:\\TWoW\\Imports\\TurtlePresenceData.txt" # path to Turtle WoW directory 
-CLIENT_ID = ""
+TWOW_PATH = "E:\\TWoW" # change this path to your Turtle WoW directory
+FILE_PATH = f"{TWOW_PATH}\\Imports\\TurtlePresenceData.txt" # DON'T CHANGE THIS!
+CLIENT_ID = "" # insert your Discord developer Application ID here
 
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -32,17 +33,18 @@ class FileChangeHandler(FileSystemEventHandler):
                 presence_data[key] = value
         return presence_data
 
+
     def update_discord_presence(self, rpc, presence_data):
-        details = f"{presence_data['name']} - Level {presence_data['level']}"
+        details = f"{presence_data['name']} - Level {presence_data['level']}" # character name and level on the first line
         state = ""
         if presence_data['zone'] == "" and presence_data['subzone'] == "":
-            state = "In character selection"
+            state = "In character selection" # if there is no zone and subzone, you are probably in character selection
         else:
-            state = f"{presence_data['zone']} - {presence_data['subzone']}" if presence_data['subzone'] != "" else presence_data['zone']
-        large_image = "twow"
-        large_text = "Turtle WoW — Mysteries of Azeroth"
-        small_image = f"{presence_data['class'].lower()}"
-        small_text = f"{presence_data['race']} {presence_data['class']}"
+            state = f"{presence_data['zone']} - {presence_data['subzone']}" if presence_data['subzone'] != "" else presence_data['zone'] # "zone - subzone", if subzone is "" only zone is shown
+        large_image = "twow" # name of the twow image without the file extension
+        large_text = "Turtle WoW — Mysteries of Azeroth" # text for large image if you hover over it
+        small_image = f"{presence_data['class'].lower()}" # small image with class icon
+        small_text = f"{presence_data['race']} {presence_data['class']}" # text for small image if you hover over it
 
         try:
             rpc.update(
@@ -60,8 +62,8 @@ class FileChangeHandler(FileSystemEventHandler):
 
 def main():
     rpc = Presence(CLIENT_ID)
+    print("Connecting to Discord RPC...")
     rpc.connect()
-    print("Connected to Discord RPC")
 
     event_handler = FileChangeHandler(rpc, time.time())
     observer = Observer()
@@ -73,8 +75,15 @@ def main():
         while True:
             time.sleep(1)  # keep main thread alive
     except KeyboardInterrupt:
+        print("Stopping observer...")
         observer.stop()
-        print("\nStopping observer...")
+
+        print("Clearing Discord RPC activity...")
+        rpc.clear()
+
+        print("Disconnecting from Discord RPC...")
+        rpc.close()
+
     observer.join()
 
 
