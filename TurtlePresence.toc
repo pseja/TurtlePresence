@@ -3,6 +3,5 @@
 ## Author: Pseja
 ## Notes: Updates Discord presence automatically based on character information.
 ## Version: 0.0.1
-## SavedVariables: TurtlePresenceData
 
 TurtlePresence.lua
