@@ -5,39 +5,54 @@ TurtlePresence:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 TurtlePresence:RegisterEvent("PLAYER_LEVEL_UP")
 TurtlePresence:RegisterEvent("PLAYER_XP_UPDATE")
 
-local function printDebugInfo(name, realm, class, zone, level, race, subzone)
-    local debugMessage = string.format(
-        "Debug Info: Name: %s - %s, Class: %s, Zone: %s, Level: %d, Race: %s, Subzone: %s",
-        name, realm, class, zone, level, race, subzone
-    )
-    DEFAULT_CHAT_FRAME:AddMessage(debugMessage)
+local lastPresenceData = ""
+
+local function ternary(condition, T, F)
+    if cond then
+        return T
+    else
+        return F
+    end
 end
 
-local function updatePresenceData(name, realm, class, zone, level, race, subzone)
-    local fileContent = string.format(
-        "name=%s\nrealm=%s\nclass=%s\nzone=%s\nlevel=%d\nrace=%s\nsubzone=%s",
-        name, realm, class, zone, level, race, subzone
-    )
+local function getPlayerData(event, arg1) 
+    return {
+        name = UnitName("player"), 
+        realm = GetRealmName(), 
+        class = UnitClass("player"), 
+        zone = GetZoneText(), 
+        subzone = GetSubZoneText(), 
+        race = UnitRace("player"), 
+        level = ternary(event == "PLAYER_LEVEL_UP", arg1, UnitLevel("player")),
+    }
+end
 
-    -- SuperWoW feature - export to game directory/Imports/TurtlePresenceData.txt
-    ExportFile("TurtlePresenceData", fileContent)
+local function serializePlayerData(playerData)
+    return string.format(
+        "name=%s\nrealm=%s\nclass=%s\nzone=%s\nlevel=%d\nrace=%s\nsubzone=%s",
+        playerData.name, playerData.realm, playerData.class, playerData.zone,
+        playerData.level, playerData.race, playerData.subzone
+    )
+end
+
+local function printDebugInfo(playerData)
+    DEFAULT_CHAT_FRAME:AddMessage(serializePlayerData(playerData))
+end
+
+local function updatePresenceData(playerData)
+    local fileContent = serializePlayerData(playerData)
+
+    if fileContent ~= lastPresenceData then
+        -- SuperWoW feature - export to game directory/Imports/TurtlePresenceData.txt
+        ExportFile("TurtlePresenceData", fileContent)
+        lastPresenceData = fileContent
+    end
 end
 
 local function onEvent(self, event, arg1, ...)
-    local name = UnitName("player")
-    local realm = GetRealmName()
-    local class = UnitClass("player")
-    local zone = GetZoneText()
-    local subzone = GetSubZoneText()
-    local race = UnitRace("player")
-    local level = UnitLevel("player")
-
-    if event == "PLAYER_LEVEL_UP" then
-        level = arg1
-    end
-
-    -- printDebugInfo(name, realm, class, zone, level, race, subzone)
-    updatePresenceData(name, realm, class, zone, level, race, subzone)
+    local playerData = getPlayerData(event, arg1)
+    -- printDebugInfo(playerData)
+    updatePresenceData(playerData)
 end
 
 TurtlePresence:SetScript("OnEvent", onEvent)
