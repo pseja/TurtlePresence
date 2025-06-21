@@ -4,9 +4,16 @@ from pypresence import Presence
 import time
 import os
 
-TWOW_PATH = "E:\\TWoW" # change this path to your Turtle WoW directory
-FILE_PATH = f"{TWOW_PATH}\\Imports\\TurtlePresenceData.txt" # DON'T CHANGE THIS!
-CLIENT_ID = "" # insert your Discord developer Application ID here
+# TODO: CHANGE THESE VARIABLES BEFORE RUNNING THE SCRIPT!
+# #######################################################
+# change this path to your Turtle WoW directory
+TWOW_PATH = "E:\\TWoW"
+# insert your Discord developer Application ID here
+CLIENT_ID = "1234567890987654321"
+# #######################################################
+
+# DON'T CHANGE THIS!
+FILE_PATH = f"{TWOW_PATH}\\Imports\\TurtlePresenceData.txt"
 
 
 class FileChangeHandler(FileSystemEventHandler):
