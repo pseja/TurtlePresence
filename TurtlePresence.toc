@@ -1,7 +1,7 @@
 ## Interface: 11200
-## Title: |cff0AFC0ATurtle|cffffffffPresence
-## Author: Pseja
+## Title: |cff0AFC0ATurtle|cffffffffPresence |cffffffffby |cffcba6f7pseja
+## Author: pseja
 ## Notes: Updates Discord presence automatically based on character information.
-## Version: 0.0.1
+## Version: GIT
 
 TurtlePresence.lua
